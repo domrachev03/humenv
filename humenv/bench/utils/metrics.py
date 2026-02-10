@@ -9,8 +9,41 @@ import numpy as np
 import ot
 
 
-def distance_smpl(next_obs, goal):
-    return torch.norm(next_obs[..., :214] - goal[..., :214], dim=-1)
+# ---------------------------------------------------------------------------
+# Observation layout helpers
+# ---------------------------------------------------------------------------
+# Observation layout per compute_humanoid_self_obs_v2:
+#   root_h(1) + local_body_pos((n-1)*3) + local_body_rot(n*6)
+#   + local_body_vel(n*3) + local_body_ang_vel(n*3)
+# Total = 15*n - 2, so n = (obs_dim + 2) // 15
+#
+# "Pose" = root_h + local_body_pos + local_body_rot = 9*n - 2
+
+def _infer_num_bodies(obs_dim: int) -> int:
+    """Infer number of rigid bodies from observation dimension."""
+    return (obs_dim + 2) // 15
+
+
+def _pose_dim(obs_dim: int) -> int:
+    """Pose dimension (root_h + local_body_pos + local_body_rot)."""
+    n = _infer_num_bodies(obs_dim)
+    return 9 * n - 2
+
+
+def _local_body_pos_dim(obs_dim: int) -> int:
+    """Local body position dimension ((n-1)*3, root removed)."""
+    n = _infer_num_bodies(obs_dim)
+    return (n - 1) * 3
+
+
+def distance_pose(next_obs, goal):
+    """Distance between pose portions of two observation tensors."""
+    pd = _pose_dim(next_obs.shape[-1])
+    return torch.norm(next_obs[..., :pd] - goal[..., :pd], dim=-1)
+
+
+# Backward-compatible alias
+distance_smpl = distance_pose
 
 
 def get_episode_goal_stats(episodes: dict, device="cpu", bound: float = 2.0, margin: float = 2.0) -> torch.tensor:
@@ -64,7 +97,8 @@ def distance_proximity(next_obs: torch.Tensor, tracking_target: torch.Tensor, bo
 
 
 def get_pose(obs: torch.Tensor):
-    return obs[:, :214]
+    pd = _pose_dim(obs.shape[-1])
+    return obs[:, :pd]
 
 
 def distance_matrix(X: torch.Tensor, Y: torch.Tensor):
@@ -100,7 +134,6 @@ def emd_numpy(next_obs: torch.Tensor, tracking_target: torch.Tensor):
 
 
 ROOT_H_OBS = 1
-LOCAL_BODY_POS = 69
 
 
 def phc_metrics(next_obs: torch.Tensor, tracking_target: torch.Tensor):
@@ -109,11 +142,13 @@ def phc_metrics(next_obs: torch.Tensor, tracking_target: torch.Tensor):
     Adapted from: https://github.com/ZhengyiLuo/SMPLSim/blob/main/smpl_sim/smpllib/smpl_eval.py
     """
     stats = {}
+    obs_dim = next_obs.shape[-1]
+    local_body_pos = _local_body_pos_dim(obs_dim)
     # if self_obs_v == 2 we can get xpos in the following way (it does not contain root)
-    xpos_idxs = [ROOT_H_OBS, ROOT_H_OBS + LOCAL_BODY_POS]
+    xpos_idxs = [ROOT_H_OBS, ROOT_H_OBS + local_body_pos]
     # Next observation should match the desired target (if possible in 1 step)
-    jpos_pred = next_obs[:, xpos_idxs[0] : xpos_idxs[1]]  # num_parallel_env x time x 69
-    jpos_gt = tracking_target[:, xpos_idxs[0] : xpos_idxs[1]]  # num_parallel_env x time x 69
+    jpos_pred = next_obs[:, xpos_idxs[0] : xpos_idxs[1]]
+    jpos_gt = tracking_target[:, xpos_idxs[0] : xpos_idxs[1]]
     # this is global and uses xpos
     stats["mpjpe_g"] = torch.norm(jpos_gt - jpos_pred, dim=1).mean() * 1000
 
@@ -128,8 +163,8 @@ def phc_metrics(next_obs: torch.Tensor, tracking_target: torch.Tensor):
     stats["accel_dist"] = torch.norm(accel_pred - accel_gt, dim=1).mean() * 1000
 
     # the success measure used in PHC
-    jpos_pred = jpos_pred.reshape(jpos_pred.shape[0], -1, 3)  # length x 23 x 3
-    jpos_gt = jpos_gt.reshape(jpos_gt.shape[0], -1, 3)  # length x 23 x 3
+    jpos_pred = jpos_pred.reshape(jpos_pred.shape[0], -1, 3)  # length x n_joints x 3
+    jpos_gt = jpos_gt.reshape(jpos_gt.shape[0], -1, 3)  # length x n_joints x 3
     stats["success_phc_linf"] = torch.all(torch.norm(jpos_pred - jpos_gt, dim=-1) <= 0.5).float()
     stats["success_phc_mean"] = torch.all(torch.norm(jpos_pred - jpos_gt, dim=-1).mean(dim=-1) <= 0.5).float()
 

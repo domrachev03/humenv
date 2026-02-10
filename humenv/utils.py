@@ -158,6 +158,12 @@ def remove_base_rot(quat, humanoid_type="smpl"):
     # ZL: removing the base rotation for Humanoid model
     if humanoid_type in ["smpl", "smplh", "smplx"]:
         base_rot = quat_conjugate(np.array([[0.5, 0.5, 0.5, 0.5]]))  # SMPL
+    elif humanoid_type == "skeleton":
+        # Skeleton model: remove Y-up to Z-up rotation (quat 0.707, 0.707, 0, 0)
+        base_rot = quat_conjugate(np.array([[0.7071067811865475, 0.7071067811865475, 0.0, 0.0]]))
+    else:
+        # No base rotation removal for unknown types
+        return quat
 
     shape = quat.shape[0]
     return quat_mul(quat, base_rot.repeat(shape, 1))

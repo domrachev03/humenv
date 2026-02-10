@@ -23,6 +23,47 @@ REWARD_LIMITS = {
     "x": [0, float("inf"), 1],
 }
 
+# Body name mapping: SMPL name -> skeleton name
+_SKELETON_BODY_MAP = {
+    "Head": "torso",
+    "Chest": "torso",
+    "Torso": "torso",
+    "Spine": "torso",
+    "Pelvis": "pelvis",
+    "L_Hand": "hand_l",
+    "R_Hand": "hand_r",
+    "L_Knee": "tibia_l",
+    "R_Knee": "tibia_r",
+    "L_Ankle": "calcn_l",
+    "R_Ankle": "calcn_r",
+    "L_Hip": "femur_l",
+    "R_Hip": "femur_r",
+}
+
+# Sensor name mapping: SMPL name -> skeleton name
+_SKELETON_SENSOR_MAP = {
+    "Pelvis_gyro": "pelvis_gyro",
+    "Chest_subtreelinvel": "torso_subtreelinvel",
+}
+
+
+def _resolve_body_name(model: mujoco.MjModel, name: str) -> str:
+    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
+    if index > -1:
+        return name
+    if name in _SKELETON_BODY_MAP:
+        return _SKELETON_BODY_MAP[name]
+    return name
+
+
+def _resolve_sensor_name(model: mujoco.MjModel, name: str) -> str:
+    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, name)
+    if index > -1:
+        return name
+    if name in _SKELETON_SENSOR_MAP:
+        return _SKELETON_SENSOR_MAP[name]
+    return name
+
 
 def rot2eul(R: np.ndarray):
     beta = -np.arcsin(R[2, 0])
@@ -32,39 +73,45 @@ def rot2eul(R: np.ndarray):
 
 
 def get_xpos(model: mujoco.MjModel, data: mujoco.MjData, name: str) -> np.ndarray:
-    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
-    assert index > -1
+    resolved = _resolve_body_name(model, name)
+    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
+    assert index > -1, f"Body '{name}' (resolved to '{resolved}') not found"
     xpos = data.xpos[index].copy()
     return xpos
 
 
 def get_xmat(model: mujoco.MjModel, data: mujoco.MjData, name: str) -> np.ndarray:
-    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
-    assert index > -1
+    resolved = _resolve_body_name(model, name)
+    index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
+    assert index > -1, f"Body '{name}' (resolved to '{resolved}') not found"
     xmat = data.xmat[index].reshape((3, 3)).copy()
     return xmat
 
 
 def get_chest_upright(model: mujoco.MjModel, data: mujoco.MjData) -> float:
-    chest_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "Chest")
+    resolved = _resolve_body_name(model, "Chest")
+    chest_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
     assert chest_index > -1
     chest_upright = data.xmat[chest_index][-2]
     return chest_upright
 
 
 def get_sensor_data(model: mujoco.MjModel, data: mujoco.MjData, name: str):
-    chest_gyro_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, name)  # in global coordinate
-    assert chest_gyro_index > -1
-    start = model.sensor_adr[chest_gyro_index]
-    end = start + model.sensor_dim[chest_gyro_index]
+    resolved = _resolve_sensor_name(model, name)
+    sensor_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, resolved)
+    assert sensor_index > -1, f"Sensor '{name}' (resolved to '{resolved}') not found"
+    start = model.sensor_adr[sensor_index]
+    end = start + model.sensor_dim[sensor_index]
     sensord = data.sensordata[start:end].copy()
     return sensord
 
 
 def get_center_of_mass_linvel(model: mujoco.MjModel, data: mujoco.MjData) -> np.ndarray:
-    chest_subtree_linvel_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "Chest_subtreelinvel")  # in global coordinate
-    start = model.sensor_adr[chest_subtree_linvel_index]
-    end = start + model.sensor_dim[chest_subtree_linvel_index]
+    resolved = _resolve_sensor_name(model, "Chest_subtreelinvel")
+    sensor_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, resolved)
+    assert sensor_index > -1, f"Sensor 'Chest_subtreelinvel' (resolved to '{resolved}') not found"
+    start = model.sensor_adr[sensor_index]
+    end = start + model.sensor_dim[sensor_index]
     center_of_mass_velocity = data.sensordata[start:end].copy()
     return center_of_mass_velocity
 
@@ -126,7 +173,7 @@ class LocomotionReward(RewardFunction):
         model: mujoco.MjModel,
         data: mujoco.MjData,
     ) -> float:
-        root_h = data.xpos.copy()[1:25][0, 2]
+        root_h = get_xpos(model, data, name="Pelvis")[-1]
         head_height = get_xpos(model, data, name="Head")[-1]
         chest_upright = get_chest_upright(model, data)
         center_of_mass_velocity = get_center_of_mass_linvel(model, data)
@@ -487,7 +534,8 @@ class LieDownReward(RewardFunction):
             "R_Knee",
             "R_Ankle",
         ]:
-            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, el)
+            resolved = _resolve_body_name(model, el)
+            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
             x = data.xmat[_index][-3:]
             orientations.append(x)
         positions = [
@@ -694,7 +742,8 @@ class CrawlReward(RewardFunction):
         spine_high_reward = []
         orientation_reward = []
         for el in ["Spine", "Torso", "Chest", "Pelvis", "Head"]:
-            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, el)
+            resolved = _resolve_body_name(model, el)
+            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
             z = data.xpos[_index][-1]
             up_bound = self.spine_height + 0.2
             down_bound = self.spine_height
@@ -722,7 +771,8 @@ class CrawlReward(RewardFunction):
             )
 
         for el in ["L_Knee", "R_Knee", "L_Hip", "R_Hip", "L_Ankle", "R_Ankle"]:
-            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, el)
+            resolved = _resolve_body_name(model, el)
+            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
             x = data.xmat[_index][-3:]
             orientation_reward.append(
                 rewards.tolerance(
@@ -736,16 +786,14 @@ class CrawlReward(RewardFunction):
         pos_orient_reward = np.prod(orientation_reward) * (1.0 + np.prod(spine_high_reward)) / 2.0
 
         # velocity
-        _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "Chest")
-        xmat = data.xmat[_index].reshape((3, 3)).copy()
-        chest_euler = rot2eul(xmat)
+        chest_xmat = get_xmat(model, data, "Chest")
+        chest_euler = rot2eul(chest_xmat)
         move_angle = move_angle + chest_euler[-1]
 
         angle_alignment = []
         for el in ["Spine", "Torso", "Chest", "Pelvis"]:
-            _index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, el)
-            xmat = data.xmat[_index].reshape((3, 3)).copy()
-            euler = rot2eul(xmat)
+            body_xmat = get_xmat(model, data, el)
+            euler = rot2eul(body_xmat)
             angle_alignment.append(
                 rewards.tolerance(
                     euler[-1],
@@ -757,10 +805,7 @@ class CrawlReward(RewardFunction):
             )
         angle_alignment = (1 + np.prod(angle_alignment)) / 2.0
 
-        chest_gyro_index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "Pelvis_gyro")  # in global coordinate
-        start = model.sensor_adr[chest_gyro_index]
-        end = start + model.sensor_dim[chest_gyro_index]
-        angular_velocity = data.sensordata[start:end].copy()
+        angular_velocity = get_sensor_data(model, data, "Pelvis_gyro")
         dont_rotate = rewards.tolerance(
             np.abs(angular_velocity),
             bounds=(0, 2.5),

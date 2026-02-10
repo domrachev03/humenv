@@ -19,10 +19,40 @@ from humenv.misc.motionlib import MotionBuffer
 
 
 _XML = "assets/robot.xml"  # this is a copy of robot_july5_mpd_kp3_kd2.xml
+
+# --- Model configuration registry ---
+# Each humanoid_type maps to its body/sensor layout constants.
+
+_MODEL_CONFIGS = {
+    "smpl": {
+        "robot_idx_start": 1,
+        "robot_idx_end": 25,
+        "num_rigid_bodies": 24,
+        "num_vel_limit": 72,  # 24 * 3
+        "default_xml": "assets/robot.xml",
+        "base_rot_quat": [0.5, 0.5, 0.5, 0.5],  # SMPL base rotation to remove
+    },
+    "skeleton": {
+        "robot_idx_start": 1,
+        "robot_idx_end": 21,  # 20 bodies + world
+        "num_rigid_bodies": 20,
+        "num_vel_limit": 60,  # 20 * 3
+        "default_xml": "assets/skeleton_torque.xml",
+        "base_rot_quat": None,  # skeleton model has no SMPL base rotation
+    },
+}
+
+# Keep old module-level constants for backward compatibility
 _ROBOT_IDX_START: int = 1
 _ROBOT_IDX_END: int = 25
 _NUM_RIGID_BODIES: int = 24
 _NUM_VEL_LIMIT: int = 72
+
+
+def get_model_config(humanoid_type: str) -> dict:
+    if humanoid_type not in _MODEL_CONFIGS:
+        raise ValueError(f"Unknown humanoid_type: {humanoid_type}. Available: {list(_MODEL_CONFIGS.keys())}")
+    return _MODEL_CONFIGS[humanoid_type]
 
 
 class StateInit(Enum):
@@ -39,7 +69,7 @@ class HumEnv(gym.Env):
     def __init__(
         self,
         task: humenv.rewards.RewardFunction | str | None = None,
-        xml: str = _XML,  # it can be the path to a file or an xml string
+        xml: str | None = None,
         state_init: str | StateInit = "Default",
         camera: str = "front_side",
         render_width: int = 640,
@@ -49,8 +79,16 @@ class HumEnv(gym.Env):
         fall_prob: float = 0.3,
         motion_buffer: MotionBuffer | str | None | List[str] = None,
         motion_base_path: str | None = None,
+        humanoid_type: str = "smpl",
     ) -> None:
+        self.humanoid_type = humanoid_type
+        self._model_config = get_model_config(humanoid_type)
+
+        # Use default XML for the humanoid type if not specified
+        if xml is None:
+            xml = self._model_config["default_xml"]
         self.xml = xml
+
         self.state_init = state_init
         self.camera = camera
         self.render_width = render_width
@@ -66,7 +104,8 @@ class HumEnv(gym.Env):
             from gymnasium.envs.registration import EnvSpec
 
             self.spec = EnvSpec("humenv")
-        module_path = Path(humenv.__file__).resolve().parent
+        # Use this module's own __file__ for reliable path resolution
+        module_path = Path(__file__).resolve().parent
         if Path(self.xml).exists():
             self.model = mujoco.MjModel.from_xml_path(self.xml)
         elif (module_path / self.xml).exists():
@@ -144,12 +183,17 @@ class HumEnv(gym.Env):
 
     def get_obs(self) -> Dict[str, np.ndarray]:
         mujoco.mj_kinematics(self.model, self.data)
+        cfg = self._model_config
         obs_dict = compute_humanoid_self_obs_v2(
             self.model,
             self.data,
             upright_start=False,
             root_height_obs=True,
-            humanoid_type="smpl",
+            humanoid_type=self.humanoid_type,
+            robot_idx_start=cfg["robot_idx_start"],
+            robot_idx_end=cfg["robot_idx_end"],
+            num_rigid_bodies=cfg["num_rigid_bodies"],
+            num_vel_limit=cfg["num_vel_limit"],
         )
         return {"proprio": np.concatenate([v.ravel() for v in obs_dict.values()], axis=0, dtype=np.float64)}
 
@@ -165,7 +209,7 @@ class HumEnv(gym.Env):
     def reset_humanoid(self) -> None:
         mujoco.mj_resetData(self.model, self.data)
         if self.state_init == StateInit.Default:
-            qpos, qvel = humenv.reset.tpose(self.model, self.data, self.np_random)
+            qpos, qvel = humenv.reset.tpose(self.model, self.data, self.np_random, humanoid_type=self.humanoid_type)
         elif self.state_init == StateInit.MoCap:
             batch = self.motion_buffer.sample()
             qpos, qvel = batch["qpos"][0], batch["qvel"][0]
@@ -176,6 +220,7 @@ class HumEnv(gym.Env):
                 self.np_random,
                 self.action_space.shape[0],
                 self.action_repeat,
+                humanoid_type=self.humanoid_type,
             )
         elif self.state_init == StateInit.DefaultAndFall:
             qpos, qvel = humenv.reset.default_and_fall(
@@ -185,6 +230,7 @@ class HumEnv(gym.Env):
                 self.fall_prob,
                 self.action_space.shape[0],
                 self.action_repeat,
+                humanoid_type=self.humanoid_type,
             )
         elif self.state_init == StateInit.MoCapAndFall:
             if self.np_random.random() < self.fall_prob:
@@ -194,6 +240,7 @@ class HumEnv(gym.Env):
                     self.np_random,
                     self.action_space.shape[0],
                     self.action_repeat,
+                    humanoid_type=self.humanoid_type,
                 )
             else:
                 batch = self.motion_buffer.sample()
@@ -238,11 +285,23 @@ def compute_humanoid_self_obs_v2(
     upright_start: bool,
     root_height_obs: bool,
     humanoid_type: str,
+    robot_idx_start: int | None = None,
+    robot_idx_end: int | None = None,
+    num_rigid_bodies: int | None = None,
+    num_vel_limit: int | None = None,
 ) -> Dict[str, np.ndarray]:
-    body_pos = data.xpos.copy()[_ROBOT_IDX_START:_ROBOT_IDX_END][None,]
-    body_rot = data.xquat.copy()[_ROBOT_IDX_START:_ROBOT_IDX_END][None,]
-    body_vel = data.sensordata[:_NUM_VEL_LIMIT].reshape(_NUM_RIGID_BODIES, 3).copy()[None,]
-    body_ang_vel = data.sensordata[_NUM_VEL_LIMIT : 2 * _NUM_VEL_LIMIT].reshape(_NUM_RIGID_BODIES, 3).copy()[None,]
+    # Use model config if per-parameter overrides not given
+    if robot_idx_start is None:
+        cfg = get_model_config(humanoid_type)
+        robot_idx_start = cfg["robot_idx_start"]
+        robot_idx_end = cfg["robot_idx_end"]
+        num_rigid_bodies = cfg["num_rigid_bodies"]
+        num_vel_limit = cfg["num_vel_limit"]
+
+    body_pos = data.xpos.copy()[robot_idx_start:robot_idx_end][None,]
+    body_rot = data.xquat.copy()[robot_idx_start:robot_idx_end][None,]
+    body_vel = data.sensordata[:num_vel_limit].reshape(num_rigid_bodies, 3).copy()[None,]
+    body_ang_vel = data.sensordata[num_vel_limit : 2 * num_vel_limit].reshape(num_rigid_bodies, 3).copy()[None,]
 
     obs = OrderedDict()
 
