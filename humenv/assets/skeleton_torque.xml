@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mujoco model="GZ_DW_sub01">
-  <compiler inertiafromgeom="auto" angle="radian" balanceinertia="true" boundmass="0.001" boundinertia="0.001">
+  <compiler inertiafromgeom="auto" angle="radian" balanceinertia="true" boundmass="0.001" boundinertia="0.001" meshdir="meshes">
     <lengthrange inttotal="50" useexisting="true" />
   </compiler>
   <default>
@@ -208,85 +208,85 @@
     </body>
   </worldbody>
   <asset>
-    <mesh name="sacrum" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/sacrum.stl" scale=" 1.02105  1.02105  1.02105" />
-    <mesh name="pelvis" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/pelvis.stl" scale=" 1.02105  1.02105  1.02105" />
-    <mesh name="l_pelvis" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/l_pelvis.stl" scale=" 1.02105  1.02105  1.02105" />
-    <mesh name="femur_r" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/femur_r.stl" scale="0.908907 0.908907 0.908907" />
-    <mesh name="tibia_r" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/tibia_r.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="fibula_r" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/fibula_r.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="talus_rv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/talus_rv.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="foot" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/foot.stl" scale=" 1.06552  1.06552  1.06552" />
-    <mesh name="bofoot" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/bofoot.stl" scale=" 1.06552  1.06552  1.06552" />
-    <mesh name="femur_l" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/femur_l.stl" scale="0.908907 0.908907 0.908907" />
-    <mesh name="tibia_l" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/tibia_l.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="fibula_l" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/fibula_l.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="talus_lv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/talus_lv.stl" scale=" 1.11668  1.11668  1.11668" />
-    <mesh name="l_foot" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/l_foot.stl" scale=" 1.06552  1.06552  1.06552" />
-    <mesh name="l_bofoot" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/l_bofoot.stl" scale=" 1.06552  1.06552  1.06552" />
-    <mesh name="hat_spine" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hat_spine.stl" scale=" 1.07736  1.07736  1.07736" />
-    <mesh name="hat_jaw" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hat_jaw.stl" scale=" 1.07736  1.07736  1.07736" />
-    <mesh name="hat_skull" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hat_skull.stl" scale=" 1.07736  1.07736  1.07736" />
-    <mesh name="hat_ribs_scap" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hat_ribs_scap.stl" scale=" 1.07736  1.07736  1.07736" />
-    <mesh name="humerus_rv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/humerus_rv.stl" scale=" 1.17477  1.17477  1.17477" />
-    <mesh name="ulna_rv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ulna_rv.stl" scale=" 1.10827  1.10827  1.10827" />
-    <mesh name="radius_rv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/radius_rv.stl" scale=" 1.10827  1.10827  1.10827" />
-    <mesh name="pisiform_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/pisiform_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="lunate_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/lunate_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="scaphoid_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/scaphoid_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="triquetrum_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/triquetrum_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="hamate_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hamate_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="capitate_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/capitate_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="trapezoid_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/trapezoid_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="trapezium_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/trapezium_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal2_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal2_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_proximal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_medial_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_distal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal3_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal3_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_proximal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_medial_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_distal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal4_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal4_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_proximal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_medial_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_distal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal5_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal5_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_proximal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_medial_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_distal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal1_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal1_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="thumb_proximal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/thumb_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="thumb_distal_rvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/thumb_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="humerus_lv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/humerus_lv.stl" scale=" 1.17477  1.17477  1.17477" />
-    <mesh name="ulna_lv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ulna_lv.stl" scale=" 1.10827  1.10827  1.10827" />
-    <mesh name="radius_lv" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/radius_lv.stl" scale=" 1.10827  1.10827  1.10827" />
-    <mesh name="pisiform_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/pisiform_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="lunate_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/lunate_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="scaphoid_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/scaphoid_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="triquetrum_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/triquetrum_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="hamate_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/hamate_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="capitate_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/capitate_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="trapezoid_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/trapezoid_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="trapezium_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/trapezium_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal2_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal2_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_proximal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_medial_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="index_distal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/index_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal3_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal3_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_proximal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_medial_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="middle_distal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/middle_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal4_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal4_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_proximal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_medial_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="ring_distal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/ring_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal5_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal5_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_proximal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_medial_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="little_distal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/little_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="metacarpal1_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/metacarpal1_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="thumb_proximal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/thumb_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
-    <mesh name="thumb_distal_lvs" file="/home/dom-iva/github.com/iris/Hyensok/loco-mujoco/loco_mujoco/models/skeleton/meshes/thumb_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="sacrum" file="sacrum.stl" scale=" 1.02105  1.02105  1.02105" />
+    <mesh name="pelvis" file="pelvis.stl" scale=" 1.02105  1.02105  1.02105" />
+    <mesh name="l_pelvis" file="l_pelvis.stl" scale=" 1.02105  1.02105  1.02105" />
+    <mesh name="femur_r" file="femur_r.stl" scale="0.908907 0.908907 0.908907" />
+    <mesh name="tibia_r" file="tibia_r.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="fibula_r" file="fibula_r.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="talus_rv" file="talus_rv.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="foot" file="foot.stl" scale=" 1.06552  1.06552  1.06552" />
+    <mesh name="bofoot" file="bofoot.stl" scale=" 1.06552  1.06552  1.06552" />
+    <mesh name="femur_l" file="femur_l.stl" scale="0.908907 0.908907 0.908907" />
+    <mesh name="tibia_l" file="tibia_l.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="fibula_l" file="fibula_l.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="talus_lv" file="talus_lv.stl" scale=" 1.11668  1.11668  1.11668" />
+    <mesh name="l_foot" file="l_foot.stl" scale=" 1.06552  1.06552  1.06552" />
+    <mesh name="l_bofoot" file="l_bofoot.stl" scale=" 1.06552  1.06552  1.06552" />
+    <mesh name="hat_spine" file="hat_spine.stl" scale=" 1.07736  1.07736  1.07736" />
+    <mesh name="hat_jaw" file="hat_jaw.stl" scale=" 1.07736  1.07736  1.07736" />
+    <mesh name="hat_skull" file="hat_skull.stl" scale=" 1.07736  1.07736  1.07736" />
+    <mesh name="hat_ribs_scap" file="hat_ribs_scap.stl" scale=" 1.07736  1.07736  1.07736" />
+    <mesh name="humerus_rv" file="humerus_rv.stl" scale=" 1.17477  1.17477  1.17477" />
+    <mesh name="ulna_rv" file="ulna_rv.stl" scale=" 1.10827  1.10827  1.10827" />
+    <mesh name="radius_rv" file="radius_rv.stl" scale=" 1.10827  1.10827  1.10827" />
+    <mesh name="pisiform_rvs" file="pisiform_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="lunate_rvs" file="lunate_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="scaphoid_rvs" file="scaphoid_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="triquetrum_rvs" file="triquetrum_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="hamate_rvs" file="hamate_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="capitate_rvs" file="capitate_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="trapezoid_rvs" file="trapezoid_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="trapezium_rvs" file="trapezium_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal2_rvs" file="metacarpal2_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_proximal_rvs" file="index_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_medial_rvs" file="index_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_distal_rvs" file="index_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal3_rvs" file="metacarpal3_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_proximal_rvs" file="middle_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_medial_rvs" file="middle_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_distal_rvs" file="middle_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal4_rvs" file="metacarpal4_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_proximal_rvs" file="ring_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_medial_rvs" file="ring_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_distal_rvs" file="ring_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal5_rvs" file="metacarpal5_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_proximal_rvs" file="little_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_medial_rvs" file="little_medial_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_distal_rvs" file="little_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal1_rvs" file="metacarpal1_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="thumb_proximal_rvs" file="thumb_proximal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="thumb_distal_rvs" file="thumb_distal_rvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="humerus_lv" file="humerus_lv.stl" scale=" 1.17477  1.17477  1.17477" />
+    <mesh name="ulna_lv" file="ulna_lv.stl" scale=" 1.10827  1.10827  1.10827" />
+    <mesh name="radius_lv" file="radius_lv.stl" scale=" 1.10827  1.10827  1.10827" />
+    <mesh name="pisiform_lvs" file="pisiform_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="lunate_lvs" file="lunate_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="scaphoid_lvs" file="scaphoid_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="triquetrum_lvs" file="triquetrum_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="hamate_lvs" file="hamate_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="capitate_lvs" file="capitate_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="trapezoid_lvs" file="trapezoid_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="trapezium_lvs" file="trapezium_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal2_lvs" file="metacarpal2_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_proximal_lvs" file="index_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_medial_lvs" file="index_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="index_distal_lvs" file="index_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal3_lvs" file="metacarpal3_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_proximal_lvs" file="middle_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_medial_lvs" file="middle_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="middle_distal_lvs" file="middle_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal4_lvs" file="metacarpal4_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_proximal_lvs" file="ring_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_medial_lvs" file="ring_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="ring_distal_lvs" file="ring_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal5_lvs" file="metacarpal5_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_proximal_lvs" file="little_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_medial_lvs" file="little_medial_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="little_distal_lvs" file="little_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="metacarpal1_lvs" file="metacarpal1_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="thumb_proximal_lvs" file="thumb_proximal_lvs.stl" scale="0.905691 0.905691 0.905691" />
+    <mesh name="thumb_distal_lvs" file="thumb_distal_lvs.stl" scale="0.905691 0.905691 0.905691" />
     <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01" />
     <material name="geom" texture="texgeom" texuniform="true" />
     <texture builtin="gradient" height="100" rgb1="0.9 0.9 0.9" rgb2="0.549 0.251 0.0" type="skybox" width="100" />

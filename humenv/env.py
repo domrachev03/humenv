@@ -158,10 +158,10 @@ class HumEnv(gym.Env):
         # actual step with mujoco
         self.data.ctrl[:] = action
         mujoco.mj_step(self.model, self.data, nstep=self.action_repeat)
+        diverged = False
         if self.data.warning.number.any():
-            warning_index = np.nonzero(self.data.warning.number)[0][0]
-            warning = mujoco.mjtWarning(warning_index).name
-            raise ValueError(f"UNSTABLE MUJOCO. Stopped due to divergence ({warning}).\n")
+            diverged = True
+            self.data.warning.number[:] = 0
         mujoco.mj_step1(self.model, self.data)
 
         # compute returns
@@ -169,7 +169,7 @@ class HumEnv(gym.Env):
         # np.testing.assert_allclose(self.data.ctrl, action)
         # self.data.ctrl[:] = action
         reward = self.task.compute(self.model, self.data)
-        terminated = self.is_terminated()
+        terminated = self.is_terminated() or diverged
         truncated = False
         info = self.get_info()
         return observation, reward, terminated, truncated, info
