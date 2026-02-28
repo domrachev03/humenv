@@ -51,7 +51,7 @@ class MotionBuffer:
         for f in files:
             if f.endswith("txt"):
                 with open(f, "r") as txtf:
-                    h5files = [el.strip().replace(" ", "") for el in txtf.readlines()]
+                    h5files = [el.strip() for el in txtf.readlines()]
                 episodes = []
                 for h5 in tqdm.tqdm(h5files, leave=False):
                     h5 = canonicalize(h5, base_path=base_path)
