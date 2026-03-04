@@ -107,16 +107,16 @@
           <inertial pos="       0 -0.193252        0" mass="2.34245620943902" fullinertia="0.0190007 0.00655464 0.0213276        0        0        0" />
           <joint name="arm_flex_r" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range=" -1.5708   1.5708" ref="0" />
           <joint name="arm_add_r" type="hinge" pos="0 0 0" axis="       1        0        0" limited="true" range=" -2.0944   1.5708" ref="0" />
-          <joint name="arm_rot_r" type="hinge" pos="0 0 0" axis="       0        1        0" limited="true" range=" -1.5708   1.5708" ref="0" />
+          <joint name="arm_rot_r" type="hinge" pos="0 0 0" axis="       0        1        0" limited="true" range=" -3.1416   3.1416" ref="0" />
           <body name="ulna_r" pos="0.0154412 -0.336305 -0.0112719" quat="1.0 0.0 0.0 0.0">
             <site name="right_elbow_mimic" class="mimic" />
             <geom name="ulna_rv" type="mesh" mesh="ulna_rv" />
             <inertial pos="       0 -0.133575        0" mass="0.700143737876607" fullinertia="0.00419295 0.000874829 0.00454826        0        0        0" />
-            <joint name="elbow_flex_r" stiffness="0" type="hinge" pos="0 0 0" axis="0.226047 0.022269 0.973862" limited="true" range="       -0.3    2.618" ref="0" />
+            <joint name="elbow_flex_r" stiffness="0" type="hinge" pos="0 0 0" axis="0.226047 0.022269 0.973862" limited="true" range="       -0.6    2.618" ref="0" />
             <body name="radius_r" pos="-0.00745535 -0.0144153 0.0289071" quat="1.0 0.0 0.0 0.0">
               <geom name="radius_rv" type="mesh" mesh="radius_rv" />
               <inertial pos="       0 -0.133575        0" mass="0.700143737876607" fullinertia="0.00419295 0.000874829 0.00454826        0        0        0" />
-              <joint name="pro_sup_r" stiffness="0" type="hinge" pos="0 0 0" axis="0.056398 0.998406 0.001952" limited="true" range="       -0.6   1.5708" ref="0" />
+              <joint name="pro_sup_r" stiffness="0" type="hinge" pos="0 0 0" axis="0.056398 0.998406 0.001952" limited="true" range=" -1.5708   1.5708" ref="0" />
               <body name="hand_r" pos="-0.00974948 -0.261376 0.0150836" quat="1.0 0.0 0.0 0.0">
                 <site name="right_hand_mimic" class="mimic" />
                 <geom name="pisiform_rvs" type="mesh" mesh="pisiform_rvs" />
@@ -159,16 +159,16 @@
           <inertial pos="       0 -0.193252        0" mass="2.34245620943902" fullinertia="0.0190007 0.00655464 0.0213276        0        0        0" />
           <joint name="arm_flex_l" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range=" -1.5708   1.5708" ref="0" />
           <joint name="arm_add_l" type="hinge" pos="0 0 0" axis="      -1        0        0" limited="true" range=" -2.0944   1.5708" ref="0" />
-          <joint name="arm_rot_l" type="hinge" pos="0 0 0" axis="       0       -1        0" limited="true" range=" -1.5708   1.5708" ref="0" />
+          <joint name="arm_rot_l" type="hinge" pos="0 0 0" axis="       0       -1        0" limited="true" range=" -3.1416   3.1416" ref="0" />
           <body name="ulna_l" pos="0.0154412 -0.336305 0.0112719" quat="1.0 0.0 0.0 0.0">
             <site name="left_elbow_mimic" class="mimic" />
             <geom name="ulna_lv" type="mesh" mesh="ulna_lv" />
             <inertial pos="       0 -0.133575        0" mass="0.700143737876607" fullinertia="0.00419295 0.000874829 0.00454826        0        0        0" />
-            <joint name="elbow_flex_l" stiffness="0" type="hinge" pos="0 0 0" axis="-0.226047 -0.022269 0.973862" limited="true" range="       -0.3    2.618" ref="0" />
+            <joint name="elbow_flex_l" stiffness="0" type="hinge" pos="0 0 0" axis="-0.226047 -0.022269 0.973862" limited="true" range="       -0.6    2.618" ref="0" />
             <body name="radius_l" pos="-0.00745535 -0.0144153 -0.0289071" quat="1.0 0.0 0.0 0.0">
               <geom name="radius_lv" type="mesh" mesh="radius_lv" />
               <inertial pos="       0 -0.133575        0" mass="0.700143737876607" fullinertia="0.00419295 0.000874829 0.00454826        0        0        0" />
-              <joint name="pro_sup_l" stiffness="0" type="hinge" pos="0 0 0" axis="-0.056398 -0.998406 0.001952" limited="true" range="       -0.60   1.5708" ref="0" />
+              <joint name="pro_sup_l" stiffness="0" type="hinge" pos="0 0 0" axis="-0.056398 -0.998406 0.001952" limited="true" range=" -1.5708   1.5708" ref="0" />
               <body name="hand_l" pos="-0.00974948 -0.261376 -0.0150836" quat="1.0 0.0 0.0 0.0">
                 <site name="left_hand_mimic" class="mimic" />
                 <geom name="pisiform_lvs" type="mesh" mesh="pisiform_lvs" />
