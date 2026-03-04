@@ -23,6 +23,11 @@ REWARD_LIMITS = {
     "x": [0, float("inf"), 1],
 }
 
+# Site name mapping: SMPL body -> skeleton site (used when body mapping is insufficient)
+_SKELETON_SITE_MAP = {
+    "Head": "head_mimic",
+}
+
 # Body name mapping: SMPL name -> skeleton name
 _SKELETON_BODY_MAP = {
     "Head": "torso",
@@ -73,6 +78,12 @@ def rot2eul(R: np.ndarray):
 
 
 def get_xpos(model: mujoco.MjModel, data: mujoco.MjData, name: str) -> np.ndarray:
+    # For bodies with no direct counterpart, use site position instead
+    if name in _SKELETON_SITE_MAP:
+        site_name = _SKELETON_SITE_MAP[name]
+        site_idx = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, site_name)
+        if site_idx > -1:
+            return data.site_xpos[site_idx].copy()
     resolved = _resolve_body_name(model, name)
     index = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, resolved)
     assert index > -1, f"Body '{name}' (resolved to '{resolved}') not found"
