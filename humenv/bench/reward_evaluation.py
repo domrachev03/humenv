@@ -52,7 +52,8 @@ class RewardEvaluation:
             local_stats = []
             for _ in range(self.num_contexts):
                 pbar.set_description(f"task {task} (inference)")
-                ctx = agent.reward_inference(task=task, **self.env_kwargs)
+                inference_kwargs = {k: v for k, v in self.env_kwargs.items() if k != "task"}
+                ctx = agent.reward_inference(task=task, **inference_kwargs)
                 pbar.set_description(f"task {task} (rollout)")
                 ctx = [None] * self.num_envs if ctx is None else ctx.repeat(self.num_envs, 1)
                 st, _ = rollout(
