@@ -66,6 +66,6 @@ class RewardEvaluation:
             local_stats = convert_dict_of_lists(local_stats)
             metrics[task] = local_stats
         penv.close()
-        if mp_info is not None:
+        if mp_info is not None and mp_info.get("manager") is not None:
             mp_info["manager"].shutdown()
         return metrics

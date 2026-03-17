@@ -53,10 +53,16 @@ def make_humenv(
         assert vectorization_mode in ["async", "sync"], "supported vectorization modes are 'sync' and 'async'"
         shared_lib = None
         if motions is not None:
-            manager = CustomManager()
-            manager.start()
-            shared_lib = manager.MotionBuffer(files=motions, base_path=motion_base_path)
-            mp_info = {"manager": manager, "motion_buffer": shared_lib}
+            if vectorization_mode == "sync":
+                # For sync mode, create MotionBuffer in-process to avoid
+                # duplicating memory in a separate manager subprocess
+                shared_lib = MotionBuffer(files=motions, base_path=motion_base_path)
+                mp_info = {"manager": None, "motion_buffer": shared_lib}
+            else:
+                manager = CustomManager()
+                manager.start()
+                shared_lib = manager.MotionBuffer(files=motions, base_path=motion_base_path)
+                mp_info = {"manager": manager, "motion_buffer": shared_lib}
         env = [create_single_env(motion_buffer=shared_lib, **kwargs) for _ in range(num_envs)]
         if vectorization_mode == "sync":
             env = SyncVectorEnv(env)
