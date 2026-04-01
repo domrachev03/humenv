@@ -77,6 +77,39 @@ def rot2eul(R: np.ndarray):
     return np.array((alpha, beta, gamma))
 
 
+def get_stand_height(model: mujoco.MjModel) -> float:
+    """Compute model-specific standing height threshold.
+
+    Uses the T-pose head height with the same proportional margin
+    as SMPL (1.4 / 1.516 = 92.3%), so both models require the same
+    relative straightness to get full standing reward.
+    """
+    import humenv.reset
+    tmp_data = mujoco.MjData(model)
+    # Detect humanoid type from model dimensions
+    if model.nq == 76:
+        humanoid_type = "smpl"
+    else:
+        humanoid_type = "skeleton"
+    qpos, qvel = humenv.reset.tpose(model, tmp_data, np.random.RandomState(0), humanoid_type)
+    tmp_data.qpos[:] = qpos
+    tmp_data.qvel[:] = qvel
+    mujoco.mj_forward(model, tmp_data)
+    head_h = get_xpos(model, tmp_data, "Head")[-1]
+    # SMPL ratio: stand_height / head_height = 1.4 / 1.516 = 0.9235
+    return round(head_h * 0.9235, 2)
+
+
+_STAND_HEIGHT_CACHE: dict[int, float] = {}
+
+
+def _get_cached_stand_height(model: mujoco.MjModel) -> float:
+    key = id(model)
+    if key not in _STAND_HEIGHT_CACHE:
+        _STAND_HEIGHT_CACHE[key] = get_stand_height(model)
+    return _STAND_HEIGHT_CACHE[key]
+
+
 def get_xpos(model: mujoco.MjModel, data: mujoco.MjData, name: str) -> np.ndarray:
     # For bodies with no direct counterpart, use site position instead
     if name in _SKELETON_SITE_MAP:
@@ -195,6 +228,9 @@ class LocomotionReward(RewardFunction):
             euler = rot2eul(chest_xmat)
             move_angle = move_angle + euler[-1]
 
+        # Use model-specific stand height to enforce consistent posture
+        # across different humanoid morphologies
+        stand_h = _get_cached_stand_height(model)
         if self.stay_low:
             standing = rewards.tolerance(
                 root_h,
@@ -206,8 +242,8 @@ class LocomotionReward(RewardFunction):
         else:
             standing = rewards.tolerance(
                 head_height,
-                bounds=(self.stand_height, float("inf")),
-                margin=self.stand_height,
+                bounds=(stand_h, float("inf")),
+                margin=stand_h,
                 value_at_margin=0.01,
                 sigmoid="linear",
             )
@@ -474,10 +510,11 @@ class ArmsReward(RewardFunction):
         left_height = get_xpos(model, data, name="L_Hand")[-1]
         right_height = get_xpos(model, data, name="R_Hand")[-1]
         chest_upright = get_chest_upright(model, data)
+        stand_h = _get_cached_stand_height(model)
         standing = rewards.tolerance(
             head_height,
-            bounds=(self.stand_height, float("inf")),
-            margin=self.stand_height,
+            bounds=(stand_h, float("inf")),
+            margin=stand_h,
             value_at_margin=0.01,
             sigmoid="linear",
         )
