@@ -77,37 +77,73 @@ def rot2eul(R: np.ndarray):
     return np.array((alpha, beta, gamma))
 
 
-def get_stand_height(model: mujoco.MjModel) -> float:
-    """Compute model-specific standing height threshold.
+def _get_tpose_heights(model: mujoco.MjModel) -> dict:
+    """Compute all model-specific height thresholds from the T-pose.
 
-    Uses the T-pose head height with the same proportional margin
-    as SMPL (1.4 / 1.516 = 92.3%), so both models require the same
-    relative straightness to get full standing reward.
+    Returns a dict with heights scaled to preserve the same proportional
+    margins as the SMPL reference model:
+      SMPL T-pose:  head=1.516, pelvis=0.940, hand=1.377
+      SMPL defaults: stand_height=1.4, jump_height=1.6, stand_pelvis=0.95
     """
     import humenv.reset
     tmp_data = mujoco.MjData(model)
-    # Detect humanoid type from model dimensions
-    if model.nq == 76:
-        humanoid_type = "smpl"
-    else:
-        humanoid_type = "skeleton"
+    humanoid_type = "smpl" if model.nq == 76 else "skeleton"
     qpos, qvel = humenv.reset.tpose(model, tmp_data, np.random.RandomState(0), humanoid_type)
     tmp_data.qpos[:] = qpos
     tmp_data.qvel[:] = qvel
     mujoco.mj_forward(model, tmp_data)
+
     head_h = get_xpos(model, tmp_data, "Head")[-1]
-    # SMPL ratio: stand_height / head_height = 1.4 / 1.516 = 0.9235
-    return round(head_h * 0.9235, 2)
+    pelvis_h = get_xpos(model, tmp_data, "Pelvis")[-1]
+    hand_h = max(
+        get_xpos(model, tmp_data, "L_Hand")[-1],
+        get_xpos(model, tmp_data, "R_Hand")[-1],
+    )
+
+    # Scale all thresholds proportionally to SMPL reference
+    # SMPL ref: head=1.516, pelvis=0.940, hand=1.377
+    SMPL_HEAD = 1.516
+    SMPL_PELVIS = 0.940
+    SMPL_HAND = 1.377
+
+    head_scale = head_h / SMPL_HEAD
+    pelvis_scale = pelvis_h / SMPL_PELVIS
+    hand_scale = hand_h / SMPL_HAND if hand_h > 0.1 else 1.0
+
+    return {
+        # LocomotionReward, ArmsReward: head must be above this
+        "stand_height": round(1.4 * head_scale, 2),
+        # JumpReward: head must reach this height
+        "jump_height_scale": head_scale,
+        # HeadstandReward: pelvis must be above this when inverted
+        "stand_pelvis_height": round(0.95 * pelvis_scale, 2),
+        # RotationReward: pelvis must be above this
+        "rotation_pelvis_height": round(0.8 * pelvis_scale, 2),
+        # ArmsReward: hand height limits scaled to morphology
+        "hand_scale": hand_scale,
+        # Raw heights for reference
+        "head_h": head_h,
+        "pelvis_h": pelvis_h,
+        "hand_h": hand_h,
+    }
 
 
-_STAND_HEIGHT_CACHE: dict[int, float] = {}
+_HEIGHTS_CACHE: dict[int, dict] = {}
 
 
-def _get_cached_stand_height(model: mujoco.MjModel) -> float:
+def _get_cached_heights(model: mujoco.MjModel) -> dict:
     key = id(model)
-    if key not in _STAND_HEIGHT_CACHE:
-        _STAND_HEIGHT_CACHE[key] = get_stand_height(model)
-    return _STAND_HEIGHT_CACHE[key]
+    if key not in _HEIGHTS_CACHE:
+        _HEIGHTS_CACHE[key] = _get_tpose_heights(model)
+    return _HEIGHTS_CACHE[key]
+
+
+def get_stand_height(model: mujoco.MjModel) -> float:
+    return _get_cached_heights(model)["stand_height"]
+
+
+def get_stand_height(model: mujoco.MjModel) -> float:
+    return _get_cached_heights(model)["stand_height"]
 
 
 def get_xpos(model: mujoco.MjModel, data: mujoco.MjData, name: str) -> np.ndarray:
@@ -230,7 +266,7 @@ class LocomotionReward(RewardFunction):
 
         # Use model-specific stand height to enforce consistent posture
         # across different humanoid morphologies
-        stand_h = _get_cached_stand_height(model)
+        stand_h = get_stand_height(model)
         if self.stay_low:
             standing = rewards.tolerance(
                 root_h,
@@ -312,10 +348,13 @@ class JumpReward(RewardFunction):
         chest_upright = get_chest_upright(model, data)
         center_of_mass_velocity = get_center_of_mass_linvel(model, data)
 
+        # Scale jump height to model morphology
+        heights = _get_cached_heights(model)
+        scaled_jump = self.jump_height * heights["jump_height_scale"]
         jumping = rewards.tolerance(
             head_height,
-            bounds=(self.jump_height, self.jump_height + 0.1),
-            margin=self.jump_height,
+            bounds=(scaled_jump, scaled_jump + 0.1),
+            margin=scaled_jump,
             value_at_margin=0.01,
             sigmoid="linear",
         )
@@ -356,6 +395,8 @@ class HeadstandReward(RewardFunction):
         model: mujoco.MjModel,
         data: mujoco.MjData,
     ) -> float:
+        heights = _get_cached_heights(model)
+        scaled_pelvis_h = heights["stand_pelvis_height"]
         pelvis_height = get_xpos(model, data, name="Pelvis")[-1]
         pelvis_xmat = get_xmat(model, data, name="Pelvis")
         pelvis_orientation = pelvis_xmat[2, :].ravel()
@@ -366,8 +407,8 @@ class HeadstandReward(RewardFunction):
         head_h = get_xpos(model, data, name="Head")[-1]
         height_reward = rewards.tolerance(
             pelvis_height,
-            bounds=(self.stand_pelvis_height, float("inf")),
-            margin=self.stand_pelvis_height / 2,
+            bounds=(scaled_pelvis_h, float("inf")),
+            margin=scaled_pelvis_h / 2,
             value_at_margin=0.01,
             sigmoid="linear",
         )
@@ -394,15 +435,15 @@ class HeadstandReward(RewardFunction):
 
         high_left_foot = rewards.tolerance(
             left_foot_h,
-            bounds=(self.stand_pelvis_height, float("inf")),
-            margin=self.stand_pelvis_height / 2,
+            bounds=(scaled_pelvis_h, float("inf")),
+            margin=scaled_pelvis_h / 2,
             value_at_margin=0.01,
             sigmoid="linear",
         )
         high_right_foot = rewards.tolerance(
             right_foot_h,
-            bounds=(self.stand_pelvis_height, float("inf")),
-            margin=self.stand_pelvis_height / 2,
+            bounds=(scaled_pelvis_h, float("inf")),
+            margin=scaled_pelvis_h / 2,
             value_at_margin=0.01,
             sigmoid="linear",
         )
@@ -437,14 +478,16 @@ class RotationReward(RewardFunction):
         model: mujoco.MjModel,
         data: mujoco.MjData,
     ) -> float:
+        heights = _get_cached_heights(model)
+        scaled_pelvis_h = heights["rotation_pelvis_height"]
         pelvis_height = get_xpos(model, data, name="Pelvis")[-1]
         pelvis_xmat = get_xmat(model, data, name="Pelvis")
         pelvis_orientation = pelvis_xmat[2, :].ravel()
         angular_velocity = get_sensor_data(model, data, "Pelvis_gyro")
         height_reward = rewards.tolerance(
             pelvis_height,
-            bounds=(self.stand_pelvis_height, float("inf")),
-            margin=self.stand_pelvis_height,
+            bounds=(scaled_pelvis_h, float("inf")),
+            margin=scaled_pelvis_h,
             value_at_margin=0.01,
             sigmoid="linear",
         )
@@ -503,14 +546,16 @@ class ArmsReward(RewardFunction):
         model: mujoco.MjModel,
         data: mujoco.MjData,
     ) -> float:
-        left_limits = REWARD_LIMITS[self.left_pose]
-        right_limits = REWARD_LIMITS[self.right_pose]
+        heights = _get_cached_heights(model)
+        hs = heights["hand_scale"]
+        left_limits = [v * hs if v != float("inf") else v for v in REWARD_LIMITS[self.left_pose]]
+        right_limits = [v * hs if v != float("inf") else v for v in REWARD_LIMITS[self.right_pose]]
         head_height = get_xpos(model, data, name="Head")[-1]
         center_of_mass_velocity = get_center_of_mass_linvel(model, data)
         left_height = get_xpos(model, data, name="L_Hand")[-1]
         right_height = get_xpos(model, data, name="R_Hand")[-1]
         chest_upright = get_chest_upright(model, data)
-        stand_h = _get_cached_stand_height(model)
+        stand_h = heights["stand_height"]
         standing = rewards.tolerance(
             head_height,
             bounds=(stand_h, float("inf")),
@@ -691,7 +736,8 @@ class SitOnGroundReward(RewardFunction):
         model: mujoco.MjModel,
         data: mujoco.MjData,
     ) -> float:
-        HEAD_PELVIS_GAP = 0.58
+        heights = _get_cached_heights(model)
+        HEAD_PELVIS_GAP = heights["head_h"] - heights["pelvis_h"]
 
         pelvis_height = get_xpos(model, data, name="Pelvis")[-1]
         head_height = get_xpos(model, data, "Head")[-1]
